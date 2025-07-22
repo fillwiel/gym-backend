@@ -54,9 +54,9 @@ public class ScheduleController {
      * Retrieve a task by ID.
      *
      * @param id the task ID
-     * @return the list of tasks
+     * @return found task or 404
      */
-    @GetMapping("/list/{id}")
+    @GetMapping("/task/{id}")
     public ResponseEntity<ScheduledTask> getTask(@PathVariable final String id) {
         return schedulerService.getTask(id)
                 .map(ResponseEntity::ok)
