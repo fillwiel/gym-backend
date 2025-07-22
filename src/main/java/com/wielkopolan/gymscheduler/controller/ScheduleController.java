@@ -4,6 +4,7 @@ import com.wielkopolan.gymscheduler.dto.ScheduleRequestDTO;
 import com.wielkopolan.gymscheduler.entity.ScheduledTask;
 import com.wielkopolan.gymscheduler.service.SchedulerService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,14 +51,16 @@ public class ScheduleController {
     }
 
     /**
-     * Retrieve a list of tasks by ID.
+     * Retrieve a task by ID.
      *
      * @param id the task ID
      * @return the list of tasks
      */
     @GetMapping("/list/{id}")
-    public List<ScheduledTask> getTask(@PathVariable final String id) {
-        return schedulerService.getTask(id);
+    public ResponseEntity<ScheduledTask> getTask(@PathVariable final String id) {
+        return schedulerService.getTask(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**

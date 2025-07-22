@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -78,8 +79,8 @@ public class SchedulerService {
         }
     }
 
-    public List<ScheduledTask> getTask(final String id) {
-        return repository.findAllById(List.of(id));
+    public Optional<ScheduledTask> getTask(final String id) {
+        return repository.findById(id);
     }
 
     public List<ScheduledTask> getActiveTasksForMember(final String memberId) {
