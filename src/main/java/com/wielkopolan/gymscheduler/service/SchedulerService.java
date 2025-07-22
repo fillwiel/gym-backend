@@ -36,7 +36,7 @@ public class SchedulerService {
     }
 
     public void scheduleRequest(ScheduleRequestDTO dto) {
-        ScheduledTask task = new ScheduledTask();
+        var task = new ScheduledTask();
         task.setMemberId(defaultMemberId);
         task.setId(dto.id());
         task.setScheduledTime(convertTime(dto.scheduledTime()));

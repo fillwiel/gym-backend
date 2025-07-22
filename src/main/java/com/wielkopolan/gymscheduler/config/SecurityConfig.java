@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,12 +48,12 @@ class SecurityConfig {
     public UserDetailsManager users(final DataSource dataSource,
                                     @Value("${app.api.username}") final String username,
                                     @Value("${app.api.password}") final String password) {
-        UserDetails user = User.withUsername(username)
+        final var user = User.withUsername(username)
                 .password(password)
                 .roles("USER")
                 .passwordEncoder(passwordEncoder()::encode)
                 .build();
-        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
+        final var users = new JdbcUserDetailsManager(dataSource);
         users.createUser(user);
         return users;
     }
