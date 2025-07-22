@@ -82,6 +82,10 @@ public class SchedulerService {
         return repository.findAllById(List.of(id));
     }
 
+    public List<ScheduledTask> getActiveTasksForMember(final String memberId) {
+        return repository.findByMemberIdAndProcessedFalse(memberId);
+    }
+
     private static Instant convertTime(final OffsetDateTime dateTime) {
         return dateTime.toInstant().atZone(ZoneOffset.UTC).toInstant();
     }

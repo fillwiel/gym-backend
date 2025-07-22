@@ -59,4 +59,15 @@ public class ScheduleController {
     public List<ScheduledTask> getTask(@PathVariable final String id) {
         return schedulerService.getTask(id);
     }
+
+    /**
+     * Retrieve a list of tasks for member.
+     *
+     * @param memberId ID of member
+     * @return the list of tasks
+     */
+    @GetMapping("/members/{memberId}/tasks/active")
+    public List<ScheduledTask> getActiveTasksForMember(@PathVariable final String memberId) {
+        return schedulerService.getActiveTasksForMember(memberId);
+    }
 }
