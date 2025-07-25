@@ -64,13 +64,23 @@ public class ScheduleController {
     }
 
     /**
-     * Retrieve a list of tasks for member.
+     * Retrieve a list of pending tasks for member.
      *
      * @param memberId ID of member
      * @return the list of tasks
      */
-    @GetMapping("/members/{memberId}/tasks/active")
-    public List<ScheduledTask> getActiveTasksForMember(@PathVariable final String memberId) {
-        return schedulerService.getActiveTasksForMember(memberId);
+    @GetMapping("/members/{memberId}/tasks/pending")
+    public List<ScheduledTask> getPendingTasksForMember(@PathVariable final String memberId) {
+        return schedulerService.getPendingTasksForMember(memberId);
+    }
+    /**
+     * Retrieve a list of all tasks for member.
+     *
+     * @param memberId ID of member
+     * @return the list of tasks
+     */
+    @GetMapping("/members/{memberId}/tasks")
+    public List<ScheduledTask> getTasksForMember(@PathVariable final String memberId) {
+        return schedulerService.getTasksForMember(memberId);
     }
 }

@@ -9,4 +9,5 @@ import java.util.List;
 public interface ScheduledTaskRepository extends MongoRepository<ScheduledTask, String> {
     List<ScheduledTask> findByProcessedFalseAndScheduledTimeBefore(final Instant scheduledTime);
     List<ScheduledTask> findByMemberIdAndProcessedFalse(final String memberId);
+    List<ScheduledTask> findByMemberId(final String memberId);
 }

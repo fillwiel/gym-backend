@@ -83,8 +83,12 @@ public class SchedulerService {
         return repository.findById(id);
     }
 
-    public List<ScheduledTask> getActiveTasksForMember(final String memberId) {
+    public List<ScheduledTask> getPendingTasksForMember(final String memberId) {
         return repository.findByMemberIdAndProcessedFalse(memberId);
+    }
+
+    public List<ScheduledTask> getTasksForMember(final String memberId) {
+        return repository.findByMemberId(memberId);
     }
 
     private static Instant convertTime(final OffsetDateTime dateTime) {
