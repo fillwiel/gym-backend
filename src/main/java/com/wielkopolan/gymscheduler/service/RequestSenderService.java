@@ -14,9 +14,8 @@ public class RequestSenderService {
     private final WebClient client;
     private final String authCookieToken;
 
-    public RequestSenderService(final WebClient.Builder builder,
-                                @Value("${auth.cookie.token}") final String authCookieToken) {
-        this.client = builder.baseUrl("https://atmosfera-lodz.cms.efitness.com.pl").build();
+    public RequestSenderService(@Value("${auth.cookie.token}") final String authCookieToken) {
+        this.client = WebClient.create("https://atmosfera-lodz.cms.efitness.com.pl");
         this.authCookieToken = authCookieToken;
     }
 
