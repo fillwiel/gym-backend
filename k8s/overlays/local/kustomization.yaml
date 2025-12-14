@@ -8,7 +8,6 @@ resources:
 # Patches for local environment
 patches:
   - path: configmap-patch.yaml
-  - path: secret-patch.yaml
   - path: ingress-patch.yaml
 
 # Override image tag for local testing (optional)
