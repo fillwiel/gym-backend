@@ -4,6 +4,7 @@ metadata:
   name: gym-backend-ingress
   namespace: gym
 spec:
+  ingressClassName: traefik
   rules:
     - host: gym.local
       http:
