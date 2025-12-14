@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gym-backend
+  namespace: gym
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: gym-backend
+  template:
+    metadata:
+      labels:
+        app: gym-backend
+    spec:
+      containers:
+        - name: gym-backend
+          image: gym-backend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+            - containerPort: 5000
+              name: actuator
+          envFrom:
+            - configMapRef:
+                name: gym-backend-config
+            - secretRef:
+                name: gym-backend-secret
+#          livenessProbe:
+#            httpGet:
+#              path: /actuator/health/liveness
+#              port: 30005
+#            initialDelaySeconds: 10
+#            periodSeconds: 10
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "250m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gym-backend-service
+  namespace: gym
+  labels:
+    app: gym-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: gym-backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: management
+      port: 5000
+      targetPort: 5000

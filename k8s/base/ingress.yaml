@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gym-backend-ingress
+  namespace: gym
+  annotations:
+    managed-by: kustomize
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: PLACEHOLDER  # patched by overlays
+      http:
+        paths:
+          # Management/Actuator endpoints
+          - path: /actuator
+            pathType: Prefix
+            backend:
+              service:
+                name: gym-backend-service
+                port:
+                  number: 5000
+
+          # Application API endpoints
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: gym-backend-service
+                port:
+                  number: 8080

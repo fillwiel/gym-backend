@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Reference base directory
+resources:
+  - ../../base
+
+# Patches for local environment
+patches:
+  - path: configmap-patch.yaml
+  - path: secret-patch.yaml
+  - path: ingress-patch.yaml
+
+# Override image tag for local testing (optional)
+#images:
+#  - name: your-dockerhub-username/gym-backend
+#    newTag: local-test
