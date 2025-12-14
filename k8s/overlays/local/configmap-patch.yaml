@@ -10,6 +10,7 @@ data:
   # Debug logging for local
   LOG_LEVEL_SECURITY: "DEBUG"
   LOG_LEVEL: "DEBUG"
+  LOG_LEVEL_MONGO: "DEBUG"
 
   # CORS for local
   ALLOWED_ORIGINS: "http://localhost,http://localhost:5173,http://127.0.0.1,*"

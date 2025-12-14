@@ -8,6 +8,7 @@ data:
 
   LOG_LEVEL_SECURITY: "DEBUG"
   LOG_LEVEL: "DEBUG"
+  LOG_LEVEL_MONGO: "DEBUG"
 
   # CORS for local
   ALLOWED_ORIGINS: "http://gym.local,http://192.168.1.100,*"
