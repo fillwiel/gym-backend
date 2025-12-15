@@ -11,5 +11,5 @@ patches:
 # FluxCD connfiguration to pull image from GitHub Container Registry
 images:
   - name: gym-backend
-    newName: ghcr.io/fillwiel/gym-scheduler
+    newName: ghcr.io/fillwiel/gym-backend
     newTag: main
