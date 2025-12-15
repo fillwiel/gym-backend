@@ -7,3 +7,9 @@ resources:
 patches:
   - path: configmap-patch.yaml
   - path: ingress-patch.yaml
+
+# FluxCD connfiguration to pull image from GitHub Container Registry
+images:
+  - name: gym-backend
+    newName: ghcr.io/fillwiel/gym-scheduler
+    newTag: main
