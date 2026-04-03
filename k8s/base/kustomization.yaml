@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: gym
 
 resources:
-  - namespace.yaml
+  - a-namespace.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml

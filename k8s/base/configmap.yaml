@@ -16,7 +16,3 @@ data:
   # CORS (patched per environment)
   ALLOWED_ORIGINS: "http://localhost"
   CORS_ALLOW_CREDENTIALS: "false"
-  # MongoDB URI (PLACEHOLDER - be patched by overlays) - currently in secrets
-#  MONGODB_URI: "PLACEHOLDER"
-#  ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:30002,https://localhost:30002/,http://gym-frontend"
-#  CORS_ALLOW_CREDENTIALS: "false"
