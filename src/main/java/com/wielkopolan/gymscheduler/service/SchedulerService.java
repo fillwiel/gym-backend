@@ -21,13 +21,14 @@ import java.util.Optional;
 @Service
 public class SchedulerService {
 
+    public static final String ALREADY_SIGNED_UP_RESPONSE = "Klubowicz jest już zapisany na te zajęcia";
     private final ScheduledTaskRepository repository;
     private final RequestSenderService senderService;
     private final ZoneId zoneId;
     private final String defaultMemberId;
     private final int numberOfDaysEndRange;
 
-    public SchedulerService(ScheduledTaskRepository repository, RequestSenderService senderService, @Value("${app.default.memberId}") final String defaultMemberId, @Value("${app.days.range}") final int numberOfDaysEndRange) {
+    public SchedulerService(final ScheduledTaskRepository repository, final RequestSenderService senderService, @Value("${app.default.memberId}") final String defaultMemberId, @Value("${app.days.range}") final int numberOfDaysEndRange) {
         this.repository = repository;
         this.senderService = senderService;
         this.defaultMemberId = defaultMemberId;
@@ -35,9 +36,15 @@ public class SchedulerService {
         this.zoneId = ZoneId.of("Europe/Warsaw");
     }
 
-    public void scheduleRequest(ScheduleRequestDTO dto) {
-        var task = new ScheduledTask();
-        task.setMemberId(defaultMemberId);
+    public void scheduleRequest(final ScheduleRequestDTO dto) {
+        if (dto == null || dto.id() == null || dto.scheduledTime() == null) {
+            throw new IllegalArgumentException("Invalid schedule request");
+        }
+        if (repository.existsById(dto.id())) {
+            throw new IllegalArgumentException("Task already exists: " + dto.id());
+        }
+        final var task = new ScheduledTask();
+        task.setMemberId(dto.memberId() == null || dto.memberId().isBlank() ? defaultMemberId : dto.memberId());
         task.setId(dto.id());
         task.setScheduledTime(convertTime(dto.scheduledTime()));
         repository.save(task);
@@ -57,7 +64,7 @@ public class SchedulerService {
     public void processDueTasks() {
         final var endOfRange = ZonedDateTime.now(zoneId).plusDays(numberOfDaysEndRange).toLocalDate().atTime(23, 59, 59).toInstant(ZoneOffset.UTC);
 
-        var dueTasks = repository.findByProcessedFalseAndScheduledTimeBefore(endOfRange);
+        final var dueTasks = repository.findByProcessedFalseAndScheduledTimeBefore(endOfRange);
         log.info("Found {} due tasks to process", dueTasks.size());
         for (var task : dueTasks) {
             processTask(task);
@@ -69,13 +76,21 @@ public class SchedulerService {
     }
 
     private void processTask(final ScheduledTask task) {
-        boolean success = senderService.sendPostRequest(task);
-        if (success) {
+        final var responseBody = senderService.sendPostRequest(task).getBody();
+        if (responseBody == null) {
+            log.warn("Could not send post request to scheduled task {}", task.getId());
+            return;
+        }
+        if (responseBody.success()) {
             log.info("Successfully signed up for class with ID {}", task.getId());
             task.setProcessed(true);
             repository.save(task);
         } else {
-            log.warn("Failed to sign up for class with ID {}", task.getId());
+            if (ALREADY_SIGNED_UP_RESPONSE.equals(responseBody.errorMessage())) {
+                task.setProcessed(true);
+                repository.save(task);
+            }
+            log.warn("Failed to sign up for class with ID {}. Reason: {}", task.getId(), responseBody.errorMessage());
         }
     }
 
@@ -92,6 +107,7 @@ public class SchedulerService {
     }
 
     private static Instant convertTime(final OffsetDateTime dateTime) {
+        //TODO remove redundant .atZone(ZoneOffset.UTC).toInstant() , but test first.
         return dateTime.toInstant().atZone(ZoneOffset.UTC).toInstant();
     }
 }
