@@ -17,7 +17,7 @@ spec:
       containers:
         - name: gym-backend
           image: gym-backend
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8080
