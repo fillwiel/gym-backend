@@ -18,20 +18,20 @@ public class RequestSenderService {
     private final String authCookieToken;
     private final String cmsURL;
 
-    public RequestSenderService(@Value("${auth.cookie.token}") final String authCookieToken, @Value("${app.cms.url}") final String cmsURL) {
+    public RequestSenderService(@Value("${auth.cookie.token}") final String authCookieToken, @Value("${app.cms.url}") final String cmsURL, final RestClient.Builder builder) {
         this.authCookieToken = authCookieToken;
         this.cmsURL = cmsURL;
-        this.client = RestClient.builder().baseUrl(cmsURL).build();
+        this.client = builder.baseUrl(cmsURL).build();
     }
 
     @Retryable(
-            includes = {HttpServerErrorException.class},
+            includes = HttpServerErrorException.class,
             maxRetries = 3,
             delayString = "2000ms",
             multiplier = 1.5,
             maxDelay = 3000
     )
-    public ResponseEntity<GymResponseBody> sendPostRequest(final ScheduledTask task) {
+    public ResponseEntity<GymResponseBody> sendPostRequest(final ScheduledTask task) throws HttpServerErrorException {
         return client.post()
                 .uri("/Schedule/RegisterForClass")
                 .header("Accept", "*/*")

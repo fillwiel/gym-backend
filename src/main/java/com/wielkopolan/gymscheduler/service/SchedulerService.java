@@ -1,5 +1,6 @@
 package com.wielkopolan.gymscheduler.service;
 
+import com.wielkopolan.gymscheduler.dto.GymResponseBody;
 import com.wielkopolan.gymscheduler.dto.ScheduleRequestDTO;
 import com.wielkopolan.gymscheduler.entity.ScheduledTask;
 import com.wielkopolan.gymscheduler.repository.ScheduledTaskRepository;
@@ -8,12 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.http.ResponseEntity;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,22 +75,35 @@ public class SchedulerService {
     }
 
     private void processTask(final ScheduledTask task) {
-        final var responseBody = senderService.sendPostRequest(task).getBody();
-        if (responseBody == null) {
-            log.warn("Could not send post request to scheduled task {}", task.getId());
-            return;
+        try {
+            sendRequestForTask(task).ifPresentOrElse(responseBody -> {
+                if (Boolean.TRUE.equals(responseBody.success())) {
+                    markTaskProcessed(task, "Successfully signed up for class with ID {}", task.getId());
+                } else {
+                    handleFailedResponse(task, responseBody);
+                }
+            }, () -> log.warn("Could not send post request to scheduled task {}", task.getId()));
+        } catch (final HttpServerErrorException e) {
+            log.error("Could not send post request to scheduled task {}", task.getId(), e);
         }
-        if (responseBody.success()) {
-            log.info("Successfully signed up for class with ID {}", task.getId());
-            task.setProcessed(true);
-            repository.save(task);
-        } else {
-            if (ALREADY_SIGNED_UP_RESPONSE.equals(responseBody.errorMessage())) {
-                task.setProcessed(true);
-                repository.save(task);
-            }
-            log.warn("Failed to sign up for class with ID {}. Reason: {}", task.getId(), responseBody.errorMessage());
+    }
+
+    private Optional<GymResponseBody> sendRequestForTask(final ScheduledTask task) {
+        final ResponseEntity<GymResponseBody> entity = senderService.sendPostRequest(task);
+        return Optional.ofNullable(entity).map(ResponseEntity::getBody);
+    }
+
+    private void markTaskProcessed(final ScheduledTask task, final String message, final Object... params) {
+        log.info(message, params);
+        task.setProcessed(true);
+        repository.save(task);
+    }
+
+    private void handleFailedResponse(final ScheduledTask task, final GymResponseBody responseBody) {
+        if (ALREADY_SIGNED_UP_RESPONSE.equals(responseBody.errorMessage())) {
+            markTaskProcessed(task, "Marking task {} as processed because member is already signed up", task.getId());
         }
+        log.warn("Failed to sign up for class with ID {}. Reason: {}", task.getId(), responseBody.errorMessage());
     }
 
     public Optional<ScheduledTask> getTask(final String id) {
