@@ -12,7 +12,7 @@ data:
   LOG_LEVEL_SECURITY: "INFO"
   LOG_LEVEL: "INFO"
   # App configuration
-  DAYS_RANGE: "5"
+  DAYS_RANGE: "4"
   # CORS (patched per environment)
   ALLOWED_ORIGINS: "http://localhost"
   CORS_ALLOW_CREDENTIALS: "false"
