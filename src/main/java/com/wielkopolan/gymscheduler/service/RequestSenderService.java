@@ -5,7 +5,6 @@ import com.wielkopolan.gymscheduler.entity.ScheduledTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
@@ -24,13 +23,6 @@ public class RequestSenderService {
         this.client = builder.baseUrl(cmsURL).build();
     }
 
-    @Retryable(
-            includes = HttpServerErrorException.class,
-            maxRetries = 3,
-            delayString = "2000ms",
-            multiplier = 1.5,
-            maxDelay = 3000
-    )
     public ResponseEntity<GymResponseBody> sendPostRequest(final ScheduledTask task) throws HttpServerErrorException {
         return client.post()
                 .uri("/Schedule/RegisterForClass")
