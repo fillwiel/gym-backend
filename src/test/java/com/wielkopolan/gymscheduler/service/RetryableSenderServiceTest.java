@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -32,8 +33,7 @@ class RetryableSenderServiceTest {
     @Test
     void whenExactInternalServerErrorSubclassOccurs_thenRetryIsTriggered() {
         // Given
-        ScheduledTask task = new ScheduledTask();
-        task.setId("class-500");
+        final var task = new ScheduledTask("class-500", "testMember", Instant.now(), false);
 
         // Replicate the exact production exception with an HTML body
         final var htmlErrorBody = "<!DOCTYPE html><html id=\"error-page\"><body>Oops. Coś poszło nie tak</body></html>";
@@ -63,8 +63,7 @@ class RetryableSenderServiceTest {
     @Test
     void whenSendRequestFails_thenRetryIsTriggered() {
         // Given
-        ScheduledTask task = new ScheduledTask();
-        task.setId("class-123");
+        final var task = new ScheduledTask("class-123", "testMember", Instant.now(), false);
 
         // When
         // Mock the underlying senderService to always throw an error
@@ -85,8 +84,7 @@ class RetryableSenderServiceTest {
     @Test
     void whenSendRequestSucceedsOnRetry_thenMethodCompletes() {
         // Given
-        var task = new ScheduledTask();
-        task.setId("class-123");
+        final var task = new ScheduledTask("class-123", "testMember", Instant.now(), false);
         final var successBody = new GymResponseBody(true, true, false, null, null, null, false, null, false, 123, null, "Success");
         final var successEntity = ResponseEntity.ok(successBody);
 
@@ -106,8 +104,7 @@ class RetryableSenderServiceTest {
     @Test
     void whenHttpClientErrorExceptionOccurs_thenNoRetryIsTriggered() {
         // Given
-        var task = new ScheduledTask();
-        task.setId("class-123");
+        final var task = new ScheduledTask("class-123", "testMember", Instant.now(), false);
 
         // Mock the underlying senderService to throw a 400 Bad Request error
         when(senderService.sendPostRequest(any(ScheduledTask.class)))

@@ -2,14 +2,17 @@ package com.wielkopolan.gymscheduler.controller;
 
 import com.wielkopolan.gymscheduler.dto.ScheduleRequestDTO;
 import com.wielkopolan.gymscheduler.entity.ScheduledTask;
-import com.wielkopolan.gymscheduler.service.TaskSchedulingService;
+import com.wielkopolan.gymscheduler.service.ScheduledTaskService;
 import com.wielkopolan.gymscheduler.service.TaskProcessingService;
+import com.wielkopolan.gymscheduler.service.TaskSchedulingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/schedule")
@@ -17,21 +20,18 @@ public class ScheduleController {
 
     private final TaskProcessingService taskProcessingService;
     private final TaskSchedulingService taskSchedulingService;
-
-    public ScheduleController(final TaskProcessingService taskProcessingService, final TaskSchedulingService taskSchedulingService) {
-        this.taskProcessingService = taskProcessingService;
-        this.taskSchedulingService = taskSchedulingService;
-    }
+    private final ScheduledTaskService scheduledTaskService;
 
     /**
      * Schedule a new task.
      *
      * @param dto the schedule request data
+     * @return created {@link ScheduledTask}
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void schedule(@RequestBody final ScheduleRequestDTO dto) {
-        taskSchedulingService.scheduleRequest(dto);
+    public ResponseEntity<ScheduledTask> schedule(@RequestBody final ScheduleRequestDTO dto) {
+        return ResponseEntity.ok(taskSchedulingService.scheduleRequest(dto));
     }
 
     /**
@@ -62,9 +62,9 @@ public class ScheduleController {
      */
     @GetMapping("/task/{id}")
     public ResponseEntity<ScheduledTask> getTask(@PathVariable final String id) {
-        return taskProcessingService.getTask(id)
+        return scheduledTaskService.getTask(id)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
@@ -75,7 +75,7 @@ public class ScheduleController {
      */
     @GetMapping("/members/{memberId}/tasks/pending")
     public List<ScheduledTask> getPendingTasksForMember(@PathVariable final String memberId) {
-        return taskProcessingService.getPendingTasksForMember(memberId);
+        return scheduledTaskService.getPendingTasksForMember(memberId);
     }
     /**
      * Retrieve a list of all tasks for member.
@@ -85,6 +85,6 @@ public class ScheduleController {
      */
     @GetMapping("/members/{memberId}/tasks")
     public List<ScheduledTask> getTasksForMember(@PathVariable final String memberId) {
-        return taskProcessingService.getTasksForMember(memberId);
+        return scheduledTaskService.getTasksForMember(memberId);
     }
 }
